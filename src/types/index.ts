@@ -12,6 +12,13 @@ export type VehicleStatus = 'Available' | 'On Trip' | 'In Shop' | 'Retired';
 export type VehicleType = 'Van' | 'Truck' | 'Refrigerated Truck' | 'Trailer' | 'Pickup' | 'Bike';
 export type Region = 'North' | 'South' | 'East' | 'West';
 
+export interface VehicleDocument {
+  id: string;
+  title: string;
+  fileUrl: string;
+  uploadDate: string;
+}
+
 export interface Vehicle {
   id: string;
   registrationNumber: string; // Unique
@@ -23,6 +30,7 @@ export interface Vehicle {
   status: VehicleStatus;
   region: Region;
   accumulatedRevenue?: number; // for exact ROI formula calculation
+  documents?: VehicleDocument[];
 }
 
 export type DriverStatus = 'Available' | 'On Trip' | 'Off Duty' | 'Suspended';

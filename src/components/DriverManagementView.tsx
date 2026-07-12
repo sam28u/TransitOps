@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTransit } from '../context/TransitContext';
 import type { Driver, DriverStatus, LicenseCategory, Region } from '../types';
-import { Users, Plus, Search, AlertCircle, MapPin, CheckCircle, ShieldAlert } from 'lucide-react';
+import { Users, Plus, Search, AlertCircle, MapPin, CheckCircle, ShieldAlert, Mail } from 'lucide-react';
 
 export const DriverManagementView: React.FC = () => {
   const { drivers, addDriver, updateDriver, rbacMatrix, currentUser } = useTransit();
@@ -25,8 +25,18 @@ export const DriverManagementView: React.FC = () => {
   const [status, setStatus] = useState<DriverStatus>('Available');
   const [region, setRegion] = useState<Region>('North');
   const [formError, setFormError] = useState('');
+  const [notification, setNotification] = useState('');
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const nextMonth = new Date(today);
+  nextMonth.setDate(today.getDate() + 30);
+  const nextMonthStr = nextMonth.toISOString().split('T')[0];
+
+  const handleSendReminder = (driverName: string) => {
+    setNotification(`Email reminder successfully sent to ${driverName} regarding license expiry.`);
+    setTimeout(() => setNotification(''), 3000);
+  };
 
   const filteredDrivers = drivers.filter((d) => {
     if (filterStatus !== 'All' && d.status !== filterStatus) return false;
@@ -178,6 +188,13 @@ export const DriverManagementView: React.FC = () => {
         </div>
       </div>
 
+      {notification && (
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3 text-xs text-emerald-300">
+          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+          <strong className="text-white font-semibold">{notification}</strong>
+        </div>
+      )}
+
       {/* Table matching Screenshot 3 */}
       <div className="card !p-0 overflow-hidden">
         <div className="table-container !border-none">
@@ -202,6 +219,7 @@ export const DriverManagementView: React.FC = () => {
               ) : (
                 filteredDrivers.map((d) => {
                   const isExpired = d.licenseExpiryDate < todayStr;
+                  const isExpiringSoon = !isExpired && d.licenseExpiryDate <= nextMonthStr;
                   return (
                     <tr key={d.id} className="hover:bg-[#21262d]">
                       <td>
@@ -262,6 +280,15 @@ export const DriverManagementView: React.FC = () => {
                         >
                           Edit Profile
                         </button>
+                        {(isExpired || isExpiringSoon) && (
+                          <button
+                            onClick={() => handleSendReminder(d.name)}
+                            className="btn btn-secondary !p-1.5 text-[11px] text-blue-400 border-blue-500/30"
+                            title="Send Expiry Reminder Email"
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );

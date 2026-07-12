@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTransit } from '../context/TransitContext';
 import type { Region, Vehicle, VehicleType } from '../types';
-import { Truck, Plus, Search, MapPin, Wrench, AlertTriangle, Edit2 } from 'lucide-react';
+import { Truck, Plus, Search, MapPin, Wrench, AlertTriangle, Edit2, FileText, Upload, Trash2 } from 'lucide-react';
 
 export const FleetRegistryView: React.FC = () => {
   const { vehicles, addVehicle, updateVehicle, rbacMatrix, currentUser } = useTransit();
@@ -23,6 +23,7 @@ export const FleetRegistryView: React.FC = () => {
   const [odometer, setOdometer] = useState<number>(10000);
   const [acquisitionCost, setAcquisitionCost] = useState<number>(45000);
   const [region, setRegion] = useState<Region>('North');
+  const [documents, setDocuments] = useState<{ id: string; title: string; fileUrl: string; uploadDate: string }[]>([]);
   const [formError, setFormError] = useState('');
 
   const filteredVehicles = vehicles.filter((v) => {
@@ -48,6 +49,7 @@ export const FleetRegistryView: React.FC = () => {
     setOdometer(14200);
     setAcquisitionCost(45000);
     setRegion('North');
+    setDocuments([]);
     setFormError('');
     setIsModalOpen(true);
   };
@@ -65,6 +67,7 @@ export const FleetRegistryView: React.FC = () => {
     setOdometer(v.odometer);
     setAcquisitionCost(v.acquisitionCost);
     setRegion(v.region);
+    setDocuments(v.documents || []);
     setFormError('');
     setIsModalOpen(true);
   };
@@ -89,6 +92,7 @@ export const FleetRegistryView: React.FC = () => {
         odometer,
         acquisitionCost,
         region,
+        documents,
       });
       setIsModalOpen(false);
     } else {
@@ -102,6 +106,7 @@ export const FleetRegistryView: React.FC = () => {
         status: 'Available',
         region,
         accumulatedRevenue: 0,
+        documents,
       });
       setIsModalOpen(false);
     }
@@ -374,6 +379,61 @@ export const FleetRegistryView: React.FC = () => {
                     className="input font-mono"
                   />
                 </div>
+              </div>
+
+              {/* Documents Section */}
+              <div className="pt-4 border-t border-[#30363d]">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-purple-400" />
+                    Vehicle Documents
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const title = prompt('Enter document title (e.g. Insurance, Registration):');
+                      if (title) {
+                        setDocuments([...documents, {
+                          id: Math.random().toString(36).substring(7),
+                          title,
+                          fileUrl: '#', // Mock URL
+                          uploadDate: new Date().toISOString().split('T')[0]
+                        }]);
+                      }
+                    }}
+                    className="btn btn-secondary !py-1 !px-3 text-[11px] flex items-center gap-1 text-purple-400 border-purple-500/30"
+                  >
+                    <Upload className="w-3 h-3" />
+                    Upload File
+                  </button>
+                </div>
+                
+                {documents.length === 0 ? (
+                  <div className="text-center py-4 bg-[#161b22] rounded-lg border border-dashed border-[#30363d]">
+                    <p className="text-xs text-gray-500">No documents uploaded yet.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {documents.map(doc => (
+                      <div key={doc.id} className="flex items-center justify-between bg-[#161b22] p-2 rounded-lg border border-[#30363d]">
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-4 h-4 text-gray-400" />
+                          <div>
+                            <p className="text-xs font-medium text-gray-200">{doc.title}</p>
+                            <p className="text-[10px] text-gray-500">Uploaded {doc.uploadDate}</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setDocuments(documents.filter(d => d.id !== doc.id))}
+                          className="p-1.5 text-gray-500 hover:text-red-400 rounded-md hover:bg-red-500/10 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#30363d]">
