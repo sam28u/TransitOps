@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node init && vite",
     "server": "tsx server/index.ts",
-    "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
-    "build": "tsc -b && vite build",
+    "dev:all": "node init && concurrently \"npm run server\" \"npm run dev\"",
+    "build": "node init && tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
@@ -16,6 +16,7 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "lucide-react": "^1.24.0",
+    "node-fetch": "^3.3.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tsx": "^4.23.0"

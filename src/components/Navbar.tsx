@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTransit } from '../context/TransitContext';
 import type { Role } from '../types';
-import { Search, RefreshCw, Radio, Sparkles } from 'lucide-react';
+import { Search, RefreshCw, Radio, Sparkles, Menu } from 'lucide-react';
 
-export const Navbar: React.FC<{ activeTab?: string; onSelectTab?: (t: string) => void }> = () => {
+export const Navbar: React.FC<{ activeTab?: string; onSelectTab?: (t: string) => void; onToggleSidebar: () => void }> = ({ onToggleSidebar }) => {
   const { currentUser, setCurrentUser, resetToDemoState } = useTransit();
 
   const roles: Role[] = ['Fleet Manager', 'Driver', 'Safety Officer', 'Financial Analyst'];
@@ -20,8 +20,16 @@ export const Navbar: React.FC<{ activeTab?: string; onSelectTab?: (t: string) =>
   };
 
   return (
-    <header className="h-16 bg-[#131824] border-b border-[#222a3d] px-6 flex items-center justify-between shrink-0 z-20">
-      <div className="flex items-center gap-6">
+    <header className="h-16 bg-[#131824] border-b border-[#222a3d] px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleSidebar}
+          className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-[#1a2130] transition-colors"
+          title="Open Menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
         {/* Status Indicator */}
         <div className="flex items-center gap-2">
           <Radio className="w-3.5 h-3.5 text-emerald-400" />

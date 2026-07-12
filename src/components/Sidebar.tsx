@@ -1,16 +1,18 @@
 import React from 'react';
 import { useTransit } from '../context/TransitContext';
 import {
-  LayoutDashboard, Truck, Users, MapPin, Wrench, Fuel, BarChart3, Settings, Lock, ShieldCheck, LogOut
+  LayoutDashboard, Truck, Users, MapPin, Wrench, Fuel, BarChart3, Settings, Lock, ShieldCheck, LogOut, X
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   onSelectTab: (tab: string) => void;
   onLogout: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, onLogout, isOpen, onClose }) => {
   const { currentUser, rbacMatrix } = useTransit();
   const currentRole = currentUser?.role || 'Fleet Manager';
   const rolePermissions = rbacMatrix[currentRole] || {};
@@ -27,20 +29,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, onLogo
   ];
 
   return (
-    <aside className="w-64 bg-[#0b0f17] border-r border-[#222a3d] flex flex-col justify-between shrink-0 select-none z-20">
+    <aside className={`fixed inset-y-0 left-0 w-64 bg-[#0b0f17] border-r border-[#222a3d] flex flex-col justify-between shrink-0 select-none z-40 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+      isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+    }`}>
       <div>
         {/* Brand Header */}
-        <div className="p-5 border-b border-[#222a3d] flex items-center gap-3.5">
-          <div className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-orange-500/20">
-            <Truck className="w-5 h-5 stroke-[2.5]" />
-          </div>
-          <div className="overflow-hidden">
-            <div className="flex items-center gap-1.5">
-              <h1 className="font-bold text-base text-white tracking-tight leading-none">TransitOps</h1>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="System Live"></span>
+        <div className="p-5 border-b border-[#222a3d] flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-600 to-orange-400 flex items-center justify-center text-white shrink-0 shadow-md shadow-orange-500/20">
+              <Truck className="w-5 h-5 stroke-[2.5]" />
             </div>
-            <p className="text-[11px] text-slate-400 font-medium mt-1">Smart Transport Hub</p>
+            <div className="overflow-hidden">
+              <div className="flex items-center gap-1.5">
+                <h1 className="font-bold text-base text-white tracking-tight leading-none">TransitOps</h1>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="System Live"></span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-medium mt-1">Smart Transport Hub</p>
+            </div>
           </div>
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-[#131824] transition-colors"
+            title="Close Menu"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Navigation List */}
