@@ -16,36 +16,54 @@ import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
 const MainLayout: React.FC = () => {
   const { currentUser, setCurrentUser, notification, clearNotification } = useTransit();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!currentUser);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
-  if (!isLoggedIn || !currentUser) {
+  if (!currentUser) {
     return (
       <Login
         onLoginSuccess={() => {
-          setIsLoggedIn(true);
+          // Handled by context state change
         }}
       />
     );
   }
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
     setCurrentUser(null);
   };
 
+  const handleSelectTab = (tab: string) => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false); // Close sidebar on mobile after navigation
+  };
+
   return (
-    <div className="flex h-screen w-full bg-[#0d1117] overflow-hidden">
-      {/* Sidebar navigation matching Screenshots 1-8 */}
+    <div className="flex h-screen w-full bg-[#0d1117] overflow-hidden relative">
+      {/* Mobile Sidebar Backdrop Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden transition-opacity duration-300"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar navigation */}
       <Sidebar
         activeTab={activeTab}
-        onSelectTab={(tab) => setActiveTab(tab)}
+        onSelectTab={handleSelectTab}
         onLogout={handleLogout}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header / Navbar */}
-        <Navbar activeTab={activeTab} onSelectTab={(tab) => setActiveTab(tab)} />
+        <Navbar
+          activeTab={activeTab}
+          onSelectTab={handleSelectTab}
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        />
 
         {/* Scrollable Viewport */}
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
